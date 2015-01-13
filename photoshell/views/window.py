@@ -38,7 +38,7 @@ class Window(Gtk.Window):
 
         # Use Dark Theme
         settings = Gtk.Settings.get_default()
-        if 'dark_theme' in config and config['dark_theme'] == True:
+        if 'dark_theme' in config and config['dark_theme'] is True:
             settings.set_property('gtk-application-prefer-dark-theme', True)
 
         # Create Header
@@ -123,6 +123,11 @@ class Window(Gtk.Window):
 
         self.header_bar.pack_end(view_box)
 
+        # Setup Touch gestures
+        self.swipe = Gtk.GestureSwipe.new(self)
+        self.swipe.connect('swipe', self.on_swipe)
+        self.pinch = Gtk.GestureZoom.new(self)
+
         # Setup Window
         self.set_wmclass("PhotoShell", "PhotoShell")
         self.set_titlebar(self.header_bar)
@@ -130,9 +135,6 @@ class Window(Gtk.Window):
         self.connect('delete-event', Gtk.main_quit)
         self.set_default_size(800, 600)
         self.set_primary_view(primary_view)
-
-        self.swipe = Gtk.GestureSwipe.new(self)
-        self.swipe.connect('swipe', self.on_swipe)
 
         self.update_ui()
 
@@ -167,6 +169,7 @@ class Window(Gtk.Window):
         if self.primary_view:
             self.remove(self.primary_view)
         self.primary_view = view
+        self.pinch.connect('scale-changed', self.primary_view.on_pinch)
 
         self.header_bar.props.subtitle = view.__class__.__name__
         self.add(self.primary_view)
