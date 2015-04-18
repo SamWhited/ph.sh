@@ -1,0 +1,10 @@
+#!/bin/sh
+
+APP=`basename $0`
+if test $(id -u) -eq 0; then
+	echo "Running ${APP} as root is a bad idea. Don't do it."
+	exit 1
+fi
+
+cd "/usr/local/share/photoshell/src"
+exec "/usr/bin/python" -OO $APP.py "$@"
